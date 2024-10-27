@@ -128,6 +128,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [dataCustomer, setDataCustomer] = useState({
     name: "Trường đại học Công nghệ Thành phố Hồ Chí Minh - HUTECH",
     phone: "02835120785",
@@ -478,6 +479,30 @@ const handleAddToCard = useCallback(
         icon={<ShoppingCartOutlined />}
         badge={{ count: selectedBooks.length }}
       />
+<Modal
+   title="Đăng nhập"
+   open={showLoginModal}
+   onCancel={() => setShowLoginModal(false)}
+   footer={null}
+ >
+   <Input
+     placeholder="Tên tài khoản"
+     prefix={<UserOutlined />}
+     value={username}
+     onChange={(e) => setUsername(e.target.value)}
+     style={{ marginBottom: 10 }}
+   />
+   <Input.Password
+     placeholder="Mật khẩu"
+     prefix={<LockOutlined />}
+     value={password}
+     onChange={(e) => setPassword(e.target.value)}
+     style={{ marginBottom: 10 }}
+   />
+   <Button type="primary" onClick={handleLogin}>
+     Đăng nhập
+   </Button>
+</Modal>
 
       {/* Modal Giỏ hàng */}
       <Modal
