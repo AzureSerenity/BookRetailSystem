@@ -32,6 +32,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import { Margin, Resolution, usePDF } from "react-to-pdf";
 
+const accountList = [
+  {
+    id: 1,
+    username: "User1",
+    password: "123456" 
+  },
+  {
+    id: 2,
+    username: "User2",
+    password: "456789"
+  },
+]
+
 const bookList = [
   {
     id: 1,
@@ -112,6 +125,9 @@ function App() {
   const [showModalInvoice, setShowModalInvoice] = useState(false);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [dataCustomer, setDataCustomer] = useState({
     name: "Trường đại học Công nghệ Thành phố Hồ Chí Minh - HUTECH",
     phone: "02835120785",
@@ -180,9 +196,23 @@ function App() {
     [selectedBooks]
   );
 
-  // Hàm xử lý khi nhấn nút "THÊM VÀO GIỎ HÀNG"
-  const handleAddToCard = useCallback(
-    (book) => {
+  //Log in
+  const handleLogin = () => {
+    const user = accountList.find((account) => account.username === username && account.password === password);
+    if(user){
+      setIsLoggedIn(true);
+      message.success("Đăng nhập thành công!");
+    }else{
+      message.console.error("Tên đăng nhập hoặc mật khẩu không đúng!");
+    }
+  };
+
+// Hàm xử lý khi nhấn nút "THÊM VÀO GIỎ HÀNG"
+const handleAddToCard = useCallback(
+  (book) => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true); // Yêu cầu đăng nhập nếu chưa đăng nhập
+    } else {
       const isBookExist = selectedBooks.findIndex(
         (item) => item.id === book.id
       );
@@ -201,9 +231,11 @@ function App() {
         message.success(`Thêm "${book.name}" vào giỏ hàng`);
         setSelectedBooks([...selectedBooks, newBook]);
       }
-    },
-    [messageApi, selectedBooks]
-  );
+    }
+  },
+  [isLoggedIn, messageApi, selectedBooks]
+);
+
 
   const handleShowModalCart = useCallback(() => {
     setShowModalCart(true);
@@ -364,7 +396,7 @@ function App() {
       <div className="mb-10">
         <Marquee speed={100}>
           <span className="text-2xl italic">
-            Chào mừng lễ quốc tế phụ nữ 20/10 giảm giá các loại sách từ{" "}
+            Chào mừng ngày nhà giáo Việt Nam 20-11 giảm giá các loại sách từ{" "}
             <span className="text-red-500">10% - 50%</span>, số lượng có hạn
           </span>
         </Marquee>
