@@ -84,57 +84,6 @@ const bookList = [
 ];
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Trạng thái đăng nhập
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleLogin = () => {
-    if (username && password) {
-      localStorage.setItem("username", username); // Lưu thông tin tài khoản vào localStorage
-      setIsLoggedIn(true); // Cập nhật trạng thái đăng nhập
-      message.success("Đăng nhập thành công!");
-    } else {
-      message.error("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu");
-    }
-  };
-
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-    if (savedUsername) setIsLoggedIn(true);
-  }, []);
-
-  if (!isLoggedIn) {
-    return (
-      <div style={{ textAlign: "center", marginTop: "20%" }}>
-        <h2>Đăng nhập</h2>
-        <Input
-          size="large"
-          placeholder="Tên đăng nhập"
-          prefix={<UserOutlined />}
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ marginBottom: "10px", width: "300px" }}
-        />
-        <Input.Password
-          size="large"
-          placeholder="Mật khẩu"
-          prefix={<LockOutlined />}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ marginBottom: "20px", width: "300px" }}
-        />
-        <Button type="primary" onClick={handleLogin}>
-          Đăng nhập
-        </Button>
-      </div>
-    );
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem("username");
-    setIsLoggedIn(false);
-  };
-
   const date = new Date();
   const { toPDF, targetRef } = usePDF({
     method: "save",
@@ -410,15 +359,12 @@ function App() {
 
   return (
     <div className="container mx-auto py-8">
-      <Button type="primary" onClick={handleLogout} style={{ float: "right" }}>
-        Đăng xuất
-      </Button>
       {contextHolder}
 
       <div className="mb-10">
         <Marquee speed={100}>
           <span className="text-2xl italic">
-            Chào mừng ngày nhà giáo Việt Nam 20-11 giảm giá các loại sách từ{" "}
+            Chào mừng lễ quốc tế phụ nữ 20/10 giảm giá các loại sách từ{" "}
             <span className="text-red-500">10% - 50%</span>, số lượng có hạn
           </span>
         </Marquee>
@@ -444,7 +390,7 @@ function App() {
                   src={book.image}
                   alt={`book_img_${index}`}
                   style={{
-                    width: "300px",
+                    width: "168px",
                     height: "250px",
                     objectFit: "cover",
                     maxWidth: "100%",
@@ -749,5 +695,5 @@ function App() {
     </div>
   );
 }
- 
+
 export default App;
