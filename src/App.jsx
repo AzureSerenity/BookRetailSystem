@@ -32,19 +32,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import { Margin, Resolution, usePDF } from "react-to-pdf";
 
-const accountList = [
-  {
-    id: 1,
-    username: "User1",
-    password: "123456" 
-  },
-  {
-    id: 2,
-    username: "User2",
-    password: "456789"
-  },
-]
-
 const bookList = [
   {
     id: 1,
@@ -97,6 +84,57 @@ const bookList = [
 ];
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Trạng thái đăng nhập
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = () => {
+    if (username && password) {
+      localStorage.setItem("username", username); // Lưu thông tin tài khoản vào localStorage
+      setIsLoggedIn(true); // Cập nhật trạng thái đăng nhập
+      message.success("Đăng nhập thành công!");
+    } else {
+      message.error("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu");
+    }
+  };
+
+  useEffect(() => {
+    const savedUsername = localStorage.getItem("username");
+    if (savedUsername) setIsLoggedIn(true);
+  }, []);
+
+  if (!isLoggedIn) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "20%" }}>
+        <h2>Đăng nhập</h2>
+        <Input
+          size="large"
+          placeholder="Tên đăng nhập"
+          prefix={<UserOutlined />}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={{ marginBottom: "10px", width: "300px" }}
+        />
+        <Input.Password
+          size="large"
+          placeholder="Mật khẩu"
+          prefix={<LockOutlined />}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ marginBottom: "20px", width: "300px" }}
+        />
+        <Button type="primary" onClick={handleLogin}>
+          Đăng nhập
+        </Button>
+      </div>
+    );
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("username");
+    setIsLoggedIn(false);
+  };
+
   const date = new Date();
   const { toPDF, targetRef } = usePDF({
     method: "save",
@@ -125,10 +163,6 @@ function App() {
   const [showModalInvoice, setShowModalInvoice] = useState(false);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [dataCustomer, setDataCustomer] = useState({
     name: "Trường đại học Công nghệ Thành phố Hồ Chí Minh - HUTECH",
     phone: "02835120785",
@@ -197,23 +231,9 @@ function App() {
     [selectedBooks]
   );
 
-  //Log in
-  const handleLogin = () => {
-    const user = accountList.find((account) => account.username === username && account.password === password);
-    if(user){
-      setIsLoggedIn(true);
-      message.success("Đăng nhập thành công!");
-    }else{
-      message.console.error("Tên đăng nhập hoặc mật khẩu không đúng!");
-    }
-  };
-
-// Hàm xử lý khi nhấn nút "THÊM VÀO GIỎ HÀNG"
-const handleAddToCard = useCallback(
-  (book) => {
-    if (!isLoggedIn) {
-      setShowLoginModal(true); // Yêu cầu đăng nhập nếu chưa đăng nhập
-    } else {
+  // Hàm xử lý khi nhấn nút "THÊM VÀO GIỎ HÀNG"
+  const handleAddToCard = useCallback(
+    (book) => {
       const isBookExist = selectedBooks.findIndex(
         (item) => item.id === book.id
       );
@@ -232,11 +252,9 @@ const handleAddToCard = useCallback(
         message.success(`Thêm "${book.name}" vào giỏ hàng`);
         setSelectedBooks([...selectedBooks, newBook]);
       }
-    }
-  },
-  [isLoggedIn, messageApi, selectedBooks]
-);
-
+    },
+    [messageApi, selectedBooks]
+  );
 
   const handleShowModalCart = useCallback(() => {
     setShowModalCart(true);
@@ -392,6 +410,9 @@ const handleAddToCard = useCallback(
 
   return (
     <div className="container mx-auto py-8">
+      <Button type="primary" onClick={handleLogout} style={{ float: "right" }}>
+        Đăng xuất
+      </Button>
       {contextHolder}
 
       <div className="mb-10">
@@ -479,30 +500,6 @@ const handleAddToCard = useCallback(
         icon={<ShoppingCartOutlined />}
         badge={{ count: selectedBooks.length }}
       />
-<Modal
-   title="Đăng nhập"
-   open={showLoginModal}
-   onCancel={() => setShowLoginModal(false)}
-   footer={null}
- >
-   <Input
-     placeholder="Tên tài khoản"
-     prefix={<UserOutlined />}
-     value={username}
-     onChange={(e) => setUsername(e.target.value)}
-     style={{ marginBottom: 10 }}
-   />
-   <Input.Password
-     placeholder="Mật khẩu"
-     prefix={<LockOutlined />}
-     value={password}
-     onChange={(e) => setPassword(e.target.value)}
-     style={{ marginBottom: 10 }}
-   />
-   <Button type="primary" onClick={handleLogin}>
-     Đăng nhập
-   </Button>
-</Modal>
 
       {/* Modal Giỏ hàng */}
       <Modal
@@ -752,5 +749,5 @@ const handleAddToCard = useCallback(
     </div>
   );
 }
-
+ 
 export default App;
